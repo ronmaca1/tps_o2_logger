@@ -24,7 +24,7 @@
 
 #include <SPI.h>
 #include <SD.h>
-unsigned long startmillis=millis();
+unsigned long startmillis = 0;
 unsigned long loopcount = 0;
 const int chipSelect = 4;
 
@@ -35,7 +35,6 @@ long mymap(long x, long in_min, long in_max, long out_min, long out_max)
 }
 
 void setup() {
- 
   // put your setup code here, to run once:
   //
   // <set all unused pins to output and LOW>
@@ -49,9 +48,11 @@ void setup() {
       pinMode(unused_pins[i],OUTPUT);
       }
   // </set all unused pins to output and LOW>
+
   // <digital pins in use>
     pinMode(HEAT_1,INPUT);
     pinMode(HEAT_2,INPUT);
+  // </digital pins in use>
   
   analogWrite(ERRORLED_RED,OFF);
   //pinMode (ERRORLED_RED,OUTPUT);
@@ -83,6 +84,7 @@ void setup() {
   #endif
   digitalWrite(ERRORLED_RED,OFF); // all is well, get on with it
   digitalWrite(ERRORLED_GREEN,GREEN_ON);
+  startmillis = millis();
 }
 
 
