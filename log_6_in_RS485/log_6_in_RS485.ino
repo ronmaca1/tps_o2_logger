@@ -1,12 +1,9 @@
 //<debuuging defines>
 #define   _DEBUG_ // for serial debugging
 #undef    _DEBUG_
-#define   _DEBUGM_ // to print millis() to SD card
-#undef    _DEBUGM_
-#ifdef  _DEBUG_
-#define _DEBUGM_
-#endif
+
 //</debuging defines>
+#define FRAMERATE       1000/10 // number of frames per second in millis
 //<pin defines>
 #define B1OXYGEN        A0
 #define B2OXYGEN        A1
@@ -25,17 +22,22 @@
 #include <SPI.h>
 #include <SD.h>
 unsigned long startmillis = 0;
-unsigned long loopcount = 0;
+unsigned long currentmillis = 0;
 
-
+/*
 long mymap(long x, long in_min, long in_max, long out_min, long out_max)
 {
   return (x - in_min) * (out_max - out_min + 1) / (in_max - in_min + 1) + out_min;
 }
-
+*/
 void setup() {
   // put your setup code here, to run once:
   //
+  // first set adc reference to external to 
+
+  
+  analogReference(EXTERNAL);       // use Vcc reference for tpos
+ 
   // <set all unused pins to output and LOW>  
   // digital pins
   int i;
@@ -82,6 +84,7 @@ void setup() {
   #endif
   digitalWrite(ERRORLED_RED,OFF); // all is well, get on with it
   digitalWrite(ERRORLED_GREEN,GREEN_ON);
+  
   startmillis = millis();
 }
 
@@ -89,35 +92,21 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 int trash, tpos, b1oxygen, b2oxygen,temp;
-
+currentmillis = millis();
 String dataString = "";
 
-if (loopcount == 0){
 dataString += String(millis()-startmillis);
-dataString += String(" : ");
-}
+dataString += String(",");
 
-// how many times have we done this
-loopcount++;
-if(loopcount >= 1000){
-  loopcount =0;
-  } 
-
-#ifdef _DEBUGM_
-dataString += String(millis()-startmillis);
-dataString += String(" : ");
-#endif
-
-  analogReference(DEFAULT);       // use Vcc reference for tpos
-  delayMicroseconds(250);
-  // <get us some throttle info> 
-  // arduino reference says first reading after referenc change are junk 
-  trash = analogRead(TPOS);
-  trash = analogRead(TPOS);
-  trash = analogRead(TPOS);
-  // should be good to get accurate readings now
-  temp = analogRead(TPOS);
-  tpos = mymap(temp,0,1023,0,5000);
+  temp = 0;
+  // get 4 samples and then average them
+  temp += analogRead(TPOS);
+  temp += analogRead(TPOS);
+  temp += analogRead(TPOS);
+  temp += analogRead(TPOS);
+  temp = temp >> 2;
+  
+  tpos = map(temp,0,1023,0,5000);
   dataString += String(tpos);
   dataString += String(",");
   // </get us some throttle info>
@@ -126,16 +115,24 @@ dataString += String(" : ");
   dataString += String(",");
   dataString += String(digitalRead(HEAT_2));
   dataString += String(",");
+  temp = 0;
+  // get 4 samples and then average them
+  temp += analogRead(B1OXYGEN);
+  temp += analogRead(B1OXYGEN);
+  temp += analogRead(B1OXYGEN);
+  temp += analogRead(B1OXYGEN);
+  temp = temp >> 2;  
+  b1oxygen = map(temp,0,1023,0,1100);
   
-  analogReference(INTERNAL);      // use 1.1v reference for O2 sensors
-  delayMicroseconds(250);
-  trash = analogRead(B1OXYGEN);
-  trash = analogRead(B1OXYGEN);
-  trash = analogRead(B1OXYGEN);  
-  temp = analogRead(B1OXYGEN);
-  b1oxygen = mymap(temp,0,1023,0,1100);
-  temp = analogRead(B2OXYGEN);
-  b2oxygen = mymap(temp,0,1023,0,1100);
+  temp = 0;
+  // get 4 samples and then average them
+  temp += analogRead(B2OXYGEN);
+  temp += analogRead(B2OXYGEN);
+  temp += analogRead(B2OXYGEN);
+  temp += analogRead(B2OXYGEN);
+  temp = temp >> 2;
+  b2oxygen = map(temp,0,1023,0,1100);
+  
   dataString += String(b1oxygen);
   dataString += String(",");
   dataString += String(b2oxygen);
@@ -166,7 +163,7 @@ dataString += String(" : ");
   
   //should give us ~10 hertz sample rate
   // with _DEBUG_ enabled
-  
+  /*
   #ifdef  _DEBUG_
     delay(40);
   #endif
@@ -177,4 +174,7 @@ dataString += String(" : ");
   #ifndef _DEBUG_ 
     delay (100);
   #endif  
+  */
+while (millis()-currentmillis < FRAMERATE);
+  
 }
