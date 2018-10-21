@@ -26,7 +26,6 @@
 #include <SD.h>
 unsigned long startmillis = 0;
 unsigned long loopcount = 0;
-const int chipSelect = 4;
 
 
 long mymap(long x, long in_min, long in_max, long out_min, long out_max)
@@ -37,11 +36,10 @@ long mymap(long x, long in_min, long in_max, long out_min, long out_max)
 void setup() {
   // put your setup code here, to run once:
   //
-  // <set all unused pins to output and LOW>
-  pinMode(chipSelect,OUTPUT);
-  const int numunused =7;
+  // <set all unused pins to output and LOW>  
   // digital pins
   int i;
+  const int numunused =7;  
   uint8_t unused_pins[numunused]{2,3,4,9,17,18,19};
     for(i=0;i<numunused;i++){
       digitalWrite(unused_pins[i],LOW);
