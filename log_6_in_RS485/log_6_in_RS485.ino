@@ -3,7 +3,8 @@
 #undef    _DEBUG_
 
 //</debuging defines>
-#define FRAMERATE       1000/10 // number of frames per second in millis
+#define SAMPLES_SECOND  10 // 10 max
+#define FRAMERATE       (1000*(1/SAMPLES_SECOND)) //convert samlpes / sec to millis
 //<pin defines>
 #define B1OXYGEN        A0
 #define B2OXYGEN        A1
@@ -92,8 +93,9 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 int trash, tpos, b1oxygen, b2oxygen,temp;
-currentmillis = millis();
+
 String dataString = "";
+currentmillis = millis();
 
 dataString += String(millis()-startmillis);
 dataString += String(",");
