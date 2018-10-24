@@ -1,10 +1,9 @@
 //<debuuging defines>
 #define   _DEBUG_ // for serial debugging
-#undef    _DEBUG_
+//#undef    _DEBUG_
 
 //</debuging defines>
-#define SAMPLES_SECOND  10 // 10 max
-#define FRAMERATE       (1000*(1/SAMPLES_SECOND)) //convert samlpes / sec to millis
+
 //<pin defines>
 #define B1OXYGEN        A0
 #define B2OXYGEN        A1
@@ -177,6 +176,6 @@ dataString += String(",");
     delay (100);
   #endif  
   */
-while (millis()-currentmillis < FRAMERATE);
+while (millis()-currentmillis < 100); // do every 100 millis aka 10 sample / sec.
   
 }
