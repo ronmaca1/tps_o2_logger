@@ -92,13 +92,25 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-int trash, tpos, b1oxygen, b2oxygen,temp;
+int notused, tpos, b1oxygen, b2oxygen,temp;
 
 String dataString = "";
 currentmillis = millis();
 
 dataString += String(millis()-startmillis);
 dataString += String(",");
+
+  temp = 0;
+  // get 4 samples and then average them
+  temp += analogRead(NOTUSED);
+  temp += analogRead(NOTUSED);
+  temp += analogRead(NOTUSED);
+  temp += analogRead(NOTUSED);
+  temp = temp >> 2;
+  
+  notused = map(temp,0,1023,0,5000);
+  dataString += String(tpos);
+  dataString += String(",");
 
   temp = 0;
   // get 4 samples and then average them
