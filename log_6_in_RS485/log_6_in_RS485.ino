@@ -6,8 +6,9 @@
 
 //<pin defines>
 #define B1OXYGEN        A0
-#define B2OXYGEN        A1
-#define TPOS            A2
+#define B2OXYGEN        A3
+#define NOTUSED         A2
+#define TPOS            A1
 #define ERRORLED_RED    5 // pwm mode
 #define ERRORLED_GREEN  6 // pwm mode
 #define HEAT_1          7 // digital input
