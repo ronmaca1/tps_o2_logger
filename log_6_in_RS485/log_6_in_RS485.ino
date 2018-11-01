@@ -89,7 +89,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-int notused, tpos, b1oxygen, b2oxygen,temp;
+int notused, tpos, b1oxygen, b2oxygen, temp;
 
 String dataString = "";
 currentmillis = millis();
@@ -97,18 +97,43 @@ currentmillis = millis();
 dataString += String(millis()-startmillis);
 dataString += String(",");
 
+ 
+  // <get us some heater info>
+  dataString += String(digitalRead(HEAT_1));
+  dataString += String(",");
+  dataString += String(digitalRead(HEAT_2));
+  dataString += String(",");
+  temp = 0;
+  // </get us some heater info>
+
+  
+  //<get us some o2 info (gain of 2(1))>
+  temp += analogRead(B1OXYGEN);
+  temp += analogRead(B1OXYGEN);
+  temp += analogRead(B1OXYGEN);
+  temp += analogRead(B1OXYGEN);
+  temp = temp >> 2;  
+  b1oxygen = map(temp,0,1023,0,1100);
+  
+  dataString += String(b1oxygen);
+  dataString += String(",");
+  //</get us some o2 info (gain of 2(1))>
+  
+  //<get us some o2 info (gain of 2(2))>
   temp = 0;
   // get 4 samples and then average them
-  temp += analogRead(NOTUSED);
-  temp += analogRead(NOTUSED);
-  temp += analogRead(NOTUSED);
-  temp += analogRead(NOTUSED);
-  temp = temp >> 2;   
-  notused = map(temp,0,1023,0,5000);
+  temp += analogRead(B2OXYGEN);
+  temp += analogRead(B2OXYGEN);
+  temp += analogRead(B2OXYGEN);
+  temp += analogRead(B2OXYGEN);
+  temp = temp >> 2;
+  b2oxygen = map(temp,0,1023,0,1100);
   
-  dataString += String(tpos);
+  dataString += String(b2oxygen);
   dataString += String(",");
-
+  //</get us some o2 info (gain of 2(2))>
+  
+  // <get us some throttle info (gain = 1/2(1))> 
   temp = 0;
   // get 4 samples and then average them
   temp += analogRead(TPOS);
@@ -122,33 +147,18 @@ dataString += String(",");
   dataString += String(",");
   // </get us some throttle info>
   
-  // <get us some heater info>
-  dataString += String(digitalRead(HEAT_1));
-  dataString += String(",");
-  dataString += String(digitalRead(HEAT_2));
-  dataString += String(",");
-  temp = 0;
-  
-  // get us some o2 info
-  temp += analogRead(B1OXYGEN);
-  temp += analogRead(B1OXYGEN);
-  temp += analogRead(B1OXYGEN);
-  temp += analogRead(B1OXYGEN);
-  temp = temp >> 2;  
-  b1oxygen = map(temp,0,1023,0,1100);
-  
+  // <get us some unused channel (gain = 1/2(2))>
   temp = 0;
   // get 4 samples and then average them
-  temp += analogRead(B2OXYGEN);
-  temp += analogRead(B2OXYGEN);
-  temp += analogRead(B2OXYGEN);
-  temp += analogRead(B2OXYGEN);
-  temp = temp >> 2;
-  b2oxygen = map(temp,0,1023,0,1100);
+  temp += analogRead(NOTUSED);
+  temp += analogRead(NOTUSED);
+  temp += analogRead(NOTUSED);
+  temp += analogRead(NOTUSED);
+  temp = temp >> 2;   
+  notused = map(temp,0,1023,0,5000);
   
-  dataString += String(b1oxygen);
-  dataString += String(",");
-  dataString += String(b2oxygen);
+  dataString += String(notused); // last channel no comma appended
+// </get us some unused channel (gain = 1/2(2))>
 
   // <SD card setup>
  
