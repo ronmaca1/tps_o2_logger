@@ -113,7 +113,7 @@ dataString += String(",");
   temp += analogRead(B1OXYGEN);
   temp += analogRead(B1OXYGEN);
   temp = temp >> 2;  
-  b1oxygen = map(temp,0,1023,0,1100);
+  b1oxygen = map(temp,0,1023,0,1250);
   
   dataString += String(b1oxygen);
   dataString += String(",");
@@ -127,7 +127,7 @@ dataString += String(",");
   temp += analogRead(B2OXYGEN);
   temp += analogRead(B2OXYGEN);
   temp = temp >> 2;
-  b2oxygen = map(temp,0,1023,0,1100);
+  b2oxygen = map(temp,0,1023,0,1250);
   
   dataString += String(b2oxygen);
   dataString += String(",");
