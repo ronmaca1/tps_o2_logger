@@ -15,7 +15,7 @@
 #define HEAT_2          8 // digital input
 //</pin defines>
 //<led defines>
-#define OFF             LOW
+#define OFF             0
 #define RED_ON          32
 #define GREEN_ON        127
 //</led defines>
@@ -35,18 +35,19 @@ void setup() {
   // put your setup code here, to run once:
   //
   // first set adc reference to external to 
+  analogReference(EXTERNAL);       // 2.5 Volt reference used
+  // disable input buffers on ADC pins,
+  // per datasheet page 43
+  DIDR0 |= _BV(ADC3D) | _BV(ADC2D) | _BV(ADC1D) | _BV(ADC0D); //adc0 through 3
 
-  
-  analogReference(EXTERNAL);       // use Vcc reference for tpos
- 
-  // <set all unused pins to output and LOW>  
+  // <set all unused pins to INPUT_PULLUP >  
   // digital pins
   int i;
-  const int numunused =7;  
-  uint8_t unused_pins[numunused]{2,3,4,9,17,18,19};
+  const int numunused =6;  
+  uint8_t unused_pins[numunused]{2,3,4,9,A4,A5};
     for(i=0;i<numunused;i++){
-      digitalWrite(unused_pins[i],LOW);
-      pinMode(unused_pins[i],OUTPUT);
+      digitalWrite(unused_pins[i],HIGH);
+      pinMode(unused_pins[i],INPUT_PULLUP);
       }
   // </set all unused pins to output and LOW>
 
@@ -55,15 +56,11 @@ void setup() {
     pinMode(HEAT_2,INPUT);
   // </digital pins in use>
   
+  //<pwm pins in use>
   analogWrite(ERRORLED_RED,OFF);
-  //pinMode (ERRORLED_RED,OUTPUT);
   analogWrite(ERRORLED_GREEN,OFF);
-  //pinMode (ERRORLED_GREEN,OUTPUT);
+  //</pwm pins in use>
 
-  
-
-  // disable input buffers on ADC pins per datasheet
-  DIDR0 = 0x7E; //adc0 through 6
   //delay(20); // a short delay to let things stabilize
   #ifdef  _DEBUG_
   Serial.begin(57600);
@@ -106,9 +103,9 @@ dataString += String(",");
   temp += analogRead(NOTUSED);
   temp += analogRead(NOTUSED);
   temp += analogRead(NOTUSED);
-  temp = temp >> 2;
-  
+  temp = temp >> 2;   
   notused = map(temp,0,1023,0,5000);
+  
   dataString += String(tpos);
   dataString += String(",");
 
@@ -118,19 +115,21 @@ dataString += String(",");
   temp += analogRead(TPOS);
   temp += analogRead(TPOS);
   temp += analogRead(TPOS);
-  temp = temp >> 2;
-  
+  temp = temp >> 2;    
   tpos = map(temp,0,1023,0,5000);
+  
   dataString += String(tpos);
   dataString += String(",");
   // </get us some throttle info>
+  
   // <get us some heater info>
   dataString += String(digitalRead(HEAT_1));
   dataString += String(",");
   dataString += String(digitalRead(HEAT_2));
   dataString += String(",");
   temp = 0;
-  // get 4 samples and then average them
+  
+  // get us some o2 info
   temp += analogRead(B1OXYGEN);
   temp += analogRead(B1OXYGEN);
   temp += analogRead(B1OXYGEN);
