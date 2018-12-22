@@ -2,7 +2,10 @@
 #define   _DEBUG_ // for serial debugging
 //#undef    _DEBUG_
 //</debuging defines>
-
+#define _TIMESTAMP_PER_MINUTE_
+#undef  _TIMESTAMP_PER_MINUTE_
+#define _TIMESTAMP_PER_POWERUP_
+//  #undef _TIMESTAMP_PER_POWERUP_
 #define RXEN            LOW
 #define RXDIS           HIGH
 #define TXEN            HIGH
@@ -35,8 +38,13 @@
 PCF8583 myrtc (0xA0);
 unsigned long startmillis = 0;
 unsigned long currentmillis = 0;
-unsigned long seconds = 0;
+//  used to timestamp output to file every minute
+#ifdef  _TIMESTAMP_PER_MINUTE_
 unsigned char loopcount = 0;
+#endif
+//  cleared first trip through the loop
+//  used to time stamp the car being started
+unsigned char powerup = 1;  
 
 /*
 long mymap(long x, long in_min, long in_max, long out_min, long out_max)
@@ -144,6 +152,7 @@ int notused, tpos, b1oxygen, b2oxygen, temp;
 
 String dataString = "";
 currentmillis = millis();
+#ifdef  _TIMESTAMP_PER_MINUTE_
 if(loopcount == 0){
   myrtc.get_time();
   char time[24];
@@ -153,6 +162,17 @@ if(loopcount == 0){
   dataString += String(time);
   dataString += ";\r\n";
   }
+#endif
+#ifdef  _TIMESTAMP_PER_POWERUP_ 
+  myrtc.get_time();
+  char time[24];
+  sprintf(time, "%02d/%02d/%02d %02d:%02d:%02d",
+  myrtc.year, myrtc.month, myrtc.day, myrtc.hour, myrtc.minute, myrtc.second);
+  
+  dataString += String(time);
+  dataString += ";\r\n";
+#endif
+  
 dataString += String(millis()-startmillis);
 dataString += String(",");
 
@@ -259,12 +279,13 @@ dataString += String(",");
   */
 
 while (millis()-currentmillis < 100); // do every 100 millis aka 10 sample / sec.
- 
+#ifdef _TIMESTAMP_PER_MINUTE_ 
 if(loopcount <=600){
   loopcount++; 
   }else {
     loopcount = 0; //reset each minute 
   // see beginning of loop for the usage of this}
   }
+#endif  
 digitalWrite(DEBUG_HEARTBEAT,!digitalRead(DEBUG_HEARTBEAT));
 }
